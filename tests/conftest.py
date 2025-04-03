@@ -64,11 +64,11 @@ class AuthActions:
     def __init__(self, client):
         self._client = client
 
-    def login(self, email='test@example.com', password='password'):
+    def login(self, username='testuser', password='password'):
         """Log in as the test user."""
         return self._client.post(
             '/auth/login',
-            data={'email': email, 'password': password}
+            data={'username': username, 'password': password}
         )
 
     def logout(self):

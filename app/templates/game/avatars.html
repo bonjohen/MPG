@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Avatar Selection - Motion Powered Games{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-center mb-4">Avatar Selection</h1>
+            <p class="text-center mb-4">Choose your avatar for the game</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='img/avatars/default.png') }}" class="card-img-top" alt="Default Avatar">
+                <div class="card-body">
+                    <h5 class="card-title">Default</h5>
+                    <p class="card-text">A basic avatar for those who prefer simplicity.</p>
+                    <button class="btn btn-primary select-avatar" data-avatar-id="1">Select</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='img/avatars/boxer.png') }}" class="card-img-top" alt="Boxer Avatar">
+                <div class="card-body">
+                    <h5 class="card-title">Boxer</h5>
+                    <p class="card-text">A powerful boxer ready for the ring.</p>
+                    <button class="btn btn-primary select-avatar" data-avatar-id="2">Select</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='img/avatars/wizard.png') }}" class="card-img-top" alt="Wizard Avatar">
+                <div class="card-body">
+                    <h5 class="card-title">Wizard</h5>
+                    <p class="card-text">A mystical wizard with powerful spells.</p>
+                    <button class="btn btn-primary select-avatar" data-avatar-id="3">Select</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='img/avatars/ninja.png') }}" class="card-img-top" alt="Ninja Avatar">
+                <div class="card-body">
+                    <h5 class="card-title">Ninja</h5>
+                    <p class="card-text">A stealthy ninja with lightning-fast reflexes.</p>
+                    <button class="btn btn-primary select-avatar" data-avatar-id="4">Select</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <a href="{{ url_for('game.lobby') }}" class="btn btn-secondary">Back to Lobby</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarButtons = document.querySelectorAll('.select-avatar');
+        
+        avatarButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const avatarId = this.getAttribute('data-avatar-id');
+                
+                // Send AJAX request to update user's avatar
+                fetch('/api/update_avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        avatar_id: avatarId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Avatar updated successfully!');
+                        window.location.href = "{{ url_for('game.lobby') }}";
+                    } else {
+                        alert('Failed to update avatar. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

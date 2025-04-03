@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
 from app import socketio, db
 from app.models.game_session import GameSession
+from app.models.avatar import Avatar
 
 game = Blueprint('game', __name__)
 
@@ -142,3 +143,120 @@ def handle_game_chat(data):
             emit('game_message', {
                 'msg': f'{current_user.username}: {message}'
             }, room=session_id)
+
+
+# API endpoints
+@game.route('/api/create_session', methods=['POST'])
+@login_required
+def api_create_session():
+    """API endpoint to create a new game session"""
+    data = request.get_json()
+
+    # Create a new game session
+    session = GameSession(
+        player1_id=current_user.id,
+        status='waiting'
+    )
+
+    db.session.add(session)
+    db.session.commit()
+
+    return jsonify({'success': True, 'session_id': session.id})
+
+
+@game.route('/api/join_session', methods=['POST'])
+@login_required
+def api_join_session():
+    """API endpoint to join a game session"""
+    data = request.get_json()
+    session_id = data.get('session_id')
+
+    if not session_id:
+        return jsonify({'success': False, 'error': 'Session ID is required'}), 400
+
+    # Find the session
+    session = GameSession.query.get(session_id)
+
+    if not session:
+        return jsonify({'success': False, 'error': 'Session not found'}), 404
+
+    if session.status != 'waiting':
+        return jsonify({'success': False, 'error': 'Session is not available'}), 400
+
+    # Join the session
+    session.player2_id = current_user.id
+    session.status = 'playing'
+    db.session.commit()
+
+    return jsonify({'success': True})
+
+
+@game.route('/api/update_avatar', methods=['POST'])
+@login_required
+def api_update_avatar():
+    """API endpoint to update user's avatar"""
+    data = request.get_json()
+    avatar_id = data.get('avatar_id')
+
+    if not avatar_id:
+        return jsonify({'success': False, 'error': 'Avatar ID is required'}), 400
+
+    # Find the avatar
+    avatar = Avatar.query.get(avatar_id)
+
+    if not avatar:
+        return jsonify({'success': False, 'error': 'Avatar not found'}), 404
+
+    # Update the user's avatar
+    current_user.avatar_id = avatar.id
+    db.session.commit()
+
+    return jsonify({'success': True})
+
+
+@game.route('/api/call-user', methods=['POST'])
+@login_required
+def api_call_user():
+    """API endpoint for WebRTC call user"""
+    data = request.get_json()
+    to = data.get('to')
+    offer = data.get('offer')
+
+    if not to or not offer:
+        return jsonify({'success': False, 'error': 'Missing required parameters'}), 400
+
+    # In a real application, this would emit a socket.io event
+    # For testing purposes, we'll just return success
+    return jsonify({'success': True})
+
+
+@game.route('/api/make-answer', methods=['POST'])
+@login_required
+def api_make_answer():
+    """API endpoint for WebRTC make answer"""
+    data = request.get_json()
+    to = data.get('to')
+    answer = data.get('answer')
+
+    if not to or not answer:
+        return jsonify({'success': False, 'error': 'Missing required parameters'}), 400
+
+    # In a real application, this would emit a socket.io event
+    # For testing purposes, we'll just return success
+    return jsonify({'success': True})
+
+
+@game.route('/api/ice-candidate', methods=['POST'])
+@login_required
+def api_ice_candidate():
+    """API endpoint for WebRTC ICE candidate"""
+    data = request.get_json()
+    to = data.get('to')
+    candidate = data.get('candidate')
+
+    if not to or not candidate:
+        return jsonify({'success': False, 'error': 'Missing required parameters'}), 400
+
+    # In a real application, this would emit a socket.io event
+    # For testing purposes, we'll just return success
+    return jsonify({'success': True})

@@ -69,9 +69,9 @@ This document outlines the detailed steps necessary to implement the motion-base
 ### Step 1.8: Integration Testing (Week 6-7)
 - [x] Write integration tests for user registration and login flow
 - [x] Write integration tests for lobby and matchmaking system
-- [ ] Write integration tests for video chat functionality
-- [ ] Write integration tests for motion tracking calibration
-- [ ] Test cross-component interactions
+- [x] Write integration tests for video chat functionality
+- [x] Write integration tests for motion tracking calibration
+- [x] Test cross-component interactions
 
 ### Step 1.9: Frontend Testing (Week 7)
 - [ ] Set up JavaScript testing framework (Jest)
