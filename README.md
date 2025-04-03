@@ -1,10 +1,10 @@
 # Motion Powered Games (MPG)
 
-A video chat-based boxing game with motion tracking, avatar skins, and interactive gameplay.
+A video chat-based platform featuring multiple motion-controlled games with avatar skins, gesture recognition, and interactive gameplay.
 
 ## Project Overview
 
-Motion Powered Games (MPG) is an interactive web application that combines video chat functionality with motion-controlled gaming. Players connect via video chat and engage in virtual boxing matches while being represented by customizable avatar skins. The application uses computer vision to track players' hand motions and facial gestures, translating them into in-game actions.
+Motion Powered Games (MPG) is an interactive web application that combines video chat functionality with motion-controlled gaming. Players connect via video chat and engage in various motion-based games while being represented by customizable avatar skins. The application uses computer vision to track players' movements, hand gestures, and facial expressions, translating them into in-game actions. Players can choose from multiple game modes, each offering unique gameplay experiences based on different motion mechanics.
 
 ![Project Banner Placeholder]
 
@@ -12,9 +12,10 @@ Motion Powered Games (MPG) is an interactive web application that combines video
 
 - **Video Chat Integration**: Real-time video and audio communication between players
 - **Avatar System**: Customizable character skins that overlay players' video feeds
-- **Motion Tracking**: Hand gesture and facial expression recognition for game control
-- **Boxing Mechanics**: Virtual matches with punch detection, blocking, and health systems
+- **Motion Tracking**: Hand gesture, body movement, and facial expression recognition
+- **Multiple Game Modes**: Five distinct games with unique motion-based mechanics
 - **Gesture Controls**: Navigate menus and trigger game features using hand signals
+- **Voice Commands**: Control game features with voice recognition
 
 ## Getting Started
 
@@ -36,10 +37,10 @@ Motion Powered Games (MPG) is an interactive web application that combines video
 2. Create and activate a virtual environment:
    ```
    python -m venv MPG_venv
-   
+
    # On Windows
    .\MPG_venv\Scripts\activate
-   
+
    # On macOS/Linux
    source MPG_venv/bin/activate
    ```
@@ -53,7 +54,7 @@ Motion Powered Games (MPG) is an interactive web application that combines video
    ```
    # Create a .env file with necessary configuration
    cp .env.example .env
-   
+
    # Edit the .env file with your settings
    ```
 
@@ -94,18 +95,33 @@ MPG/
 
 ## Development Workflow
 
-This project follows a structured development approach:
-
 1. Requirements are documented in `requirements.md`
 2. The development plan is outlined in `plan.md`
 3. Detailed implementation steps are in `steps.md`
+
+Follow the steps.
 
 When changes are needed:
 1. Update `requirements.md` first
 2. Then update `plan.md`
 3. Finally update `steps.md`
 
-Mark completed items with checkmarks as they are finished.
+## Game Modes
+
+### Boxing
+A classic boxing match where players use punch gestures (jab, cross, uppercut) to attack and blocking motions to defend. Features health systems, damage visualization, and realistic boxing mechanics.
+
+### Spell Casting Duel
+Players cast spells using specific hand gestures - pushing motions for force spells, circular motions for shields, and finger positions for elemental attacks. Master complex gesture combinations to unlock powerful magical effects.
+
+### Ninja Reflex
+A reaction-based game where players respond to visual prompts with the correct gesture. Catch shurikens, block swords, and strike targets with precise timing. Speed and accuracy determine your score.
+
+### Rhythm Conductor
+Conduct a virtual orchestra using hand movements. Control tempo, intensity, and different orchestral sections through precise gestures. Challenge others to conduct the same piece and compare your musical expression.
+
+### Shadow Dance
+Mirror your opponent's movements in a dance-like challenge. The system tracks synchronization accuracy and awards points for perfectly matched movements. Unlock special visual effects by performing specific gesture sequences.
 
 ## Technology Stack
 

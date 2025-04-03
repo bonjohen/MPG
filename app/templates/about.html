@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}About - Motion Powered Games{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1 class="mb-4">About Motion Powered Games</h1>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Our Vision</h2>
+                <p class="card-text">
+                    Motion Powered Games aims to revolutionize online gaming by combining video chat with motion tracking technology.
+                    We believe that gaming should be an immersive, physical experience that brings people together, even when they're far apart.
+                </p>
+            </div>
+        </div>
+        
+        <h2 class="mb-3">How It Works</h2>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title">Video Chat</h3>
+                        <p class="card-text">
+                            Our platform uses WebRTC technology to establish peer-to-peer video connections between players.
+                            This ensures low-latency communication, essential for responsive gameplay.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title">Motion Tracking</h3>
+                        <p class="card-text">
+                            Using advanced computer vision algorithms, we track your hand movements and facial expressions in real-time.
+                            These movements are translated into in-game actions, allowing you to control your character naturally.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title">Avatar System</h3>
+                        <p class="card-text">
+                            Choose from a variety of avatar skins that overlay your video feed. Your avatar will mimic your movements,
+                            creating a fun and personalized gaming experience.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title">Game Mechanics</h3>
+                        <p class="card-text">
+                            Engage in boxing matches with friends, where your physical movements determine your success.
+                            Throw punches, block attacks, and dodge blows using your actual body movements.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="mb-3">System Requirements</h2>
+        <ul class="list-group mb-4">
+            <li class="list-group-item">Modern web browser (Chrome, Firefox, or Edge recommended)</li>
+            <li class="list-group-item">Webcam with at least 720p resolution</li>
+            <li class="list-group-item">Stable internet connection (5+ Mbps recommended)</li>
+            <li class="list-group-item">Well-lit environment for optimal motion tracking</li>
+            <li class="list-group-item">Sufficient space to move your arms freely</li>
+        </ul>
+        
+        <div class="text-center mt-5">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
-# Video Chat Boxing Game Development Plan
+# Motion Powered Games Development Plan
 
 ## Project Overview
-This project aims to create an interactive video chat application where users can engage in a virtual boxing match while being represented by customizable avatars. The application will use computer vision to track players' movements and facial expressions, translating them into in-game actions.
+This project aims to create an interactive video chat application where users can engage in various motion-based games while being represented by customizable avatars. The application will use computer vision to track players' movements, gestures, and facial expressions, translating them into in-game actions. Players can choose from multiple game modes, each offering unique gameplay experiences based on different motion mechanics.
 
 ## Core Features
 
@@ -29,15 +29,57 @@ This project aims to create an interactive video chat application where users ca
 - Calibration system to account for different camera setups and environments
 
 ### 4. Game Mechanics
+- Multiple game modes with different motion-based mechanics
+- Scoring systems appropriate to each game type
+- Round-based matches with timers
+- Win/loss conditions and match results screen
+- Optional power-ups or special abilities
+- Voice command recognition for certain game actions
+- Progression system with unlockable content
+
+### 5. Game Modes
+
+#### a. Boxing
 - Health system with visual indicators
 - Damage calculation based on punch speed, direction, and timing
 - Blocking and dodging mechanics
 - Progressive visual damage on avatars as health decreases
-- Round-based matches with timers
-- Win/loss conditions and match results screen
-- Optional power-ups or special abilities
+- Basic moves: jab, cross, uppercut, block
 
-### 5. User Experience
+#### b. Spell Casting Duel
+- Mana/energy system with regeneration
+- Different spell types based on specific hand gestures
+- Pushing motions for force spells
+- Circular motions for shields/defensive spells
+- Specific finger positions for elemental attacks
+- Spell combination system for advanced effects
+- Cooldown timers for powerful spells
+
+#### c. Ninja Reflex
+- Reaction-based gameplay with visual prompts
+- Specific gestures required for different prompts (catching, blocking, striking)
+- Speed and accuracy scoring system
+- Progressive difficulty with faster prompts
+- Combo system for consecutive correct responses
+- Penalty system for incorrect gestures
+
+#### d. Rhythm Conductor
+- Tempo tracking for hand movements
+- Intensity detection based on gesture size/speed
+- Pattern recognition for different orchestral sections
+- Score based on precision and expressiveness
+- Multiple music pieces with varying difficulty
+- Visual feedback showing orchestral response to movements
+
+#### e. Shadow Dance
+- Movement mirroring mechanics
+- Synchronization scoring system
+- Special move sequences for visual effects
+- Timing-based multipliers for synchronized movements
+- Difficulty levels based on complexity of movements
+- Freestyle mode for creative expression
+
+### 6. User Experience
 - Intuitive UI for game controls and settings
 - Gesture-based menu navigation system
 - Visual feedback for recognized hand gestures

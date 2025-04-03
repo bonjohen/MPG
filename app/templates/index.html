@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Motion Powered Games{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2 text-center">
+        <h1 class="display-4 mb-4">Welcome to Motion Powered Games</h1>
+        <p class="lead">
+            Experience the future of gaming with our motion-controlled video chat boxing game.
+            Challenge your friends to virtual boxing matches using your own movements!
+        </p>
+        
+        <div class="my-5">
+            <img src="{{ url_for('static', filename='images/hero-image.jpg') }}" alt="Motion Powered Games" class="img-fluid rounded shadow">
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Video Chat</h5>
+                        <p class="card-text">Connect with friends in real-time video chat while you play.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Motion Controls</h5>
+                        <p class="card-text">Use your hands and body movements to control your in-game character.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Avatar Skins</h5>
+                        <p class="card-text">Choose from a variety of avatar skins to represent you in the game.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-5">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('game.lobby') }}" class="btn btn-primary btn-lg">Enter Game Lobby</a>
+            {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-3">Sign Up</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
