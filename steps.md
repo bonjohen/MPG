@@ -50,9 +50,53 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [x] Check in code to repository
 - [x] Plan adjustments for Phase 2 if necessary
 
+## Phase 1.5: Testing Sprint
+
+### Step 1.6: Test Framework Setup (Week 5-6)
+- [x] Set up pytest framework with necessary plugins
+- [x] Configure test database and environment
+- [x] Create test fixtures and helpers
+- [x] Implement test coverage reporting with minimum 80% target
+- [ ] Set up continuous integration for automated testing
+
+### Step 1.7: Unit Testing (Week 6)
+- [x] Write unit tests for models (User, Avatar, GameSession)
+- [x] Write unit tests for authentication system
+- [x] Write unit tests for form validation
+- [x] Write unit tests for utility functions
+- [ ] Ensure minimum 80% coverage for each module
+
+### Step 1.8: Integration Testing (Week 6-7)
+- [x] Write integration tests for user registration and login flow
+- [x] Write integration tests for lobby and matchmaking system
+- [ ] Write integration tests for video chat functionality
+- [ ] Write integration tests for motion tracking calibration
+- [ ] Test cross-component interactions
+
+### Step 1.9: Frontend Testing (Week 7)
+- [ ] Set up JavaScript testing framework (Jest)
+- [ ] Write tests for UI components
+- [ ] Test WebRTC functionality
+- [ ] Test motion tracking and gesture recognition
+- [ ] Test browser compatibility
+
+### Step 1.10: Performance Testing (Week 7-8)
+- [ ] Implement load testing for WebSocket connections
+- [ ] Test video streaming performance
+- [ ] Measure and optimize motion tracking performance
+- [ ] Benchmark database operations
+- [ ] Identify and fix performance bottlenecks
+
+### CHECKPOINT: Testing Sprint Review
+- [ ] Verify minimum 80% test coverage achieved
+- [ ] Run full test suite and fix any failures
+- [ ] Document testing approach and results
+- [ ] Update project documentation with testing information
+- [ ] Review and optimize test performance
+
 ## Phase 2: Avatar System and Motion Tracking
 
-### Step 2.1: Computer Vision Setup (Week 6)
+### Step 2.1: Computer Vision Setup (Week 8-9)
 - [x] Integrate MediaPipe/TensorFlow.js for pose estimation
 - [x] Implement hand tracking functionality
 - [x] Add facial landmark detection
@@ -60,7 +104,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [x] Test tracking accuracy across different lighting conditions
 - [x] Optimize performance for real-time tracking
 
-### Step 2.2: Avatar Creation (Week 7-8)
+### Step 2.2: Avatar Creation (Week 9-10)
 - [ ] Design base avatar models (minimum 3-5 different characters)
 - [ ] Implement avatar rendering system using Three.js/Pixi.js
 - [ ] Create avatar selection interface
@@ -68,7 +112,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Implement avatar-to-body mapping system
 - [ ] Test avatar rendering performance
 
-### Step 2.3: Motion Mapping (Week 8-9)
+### Step 2.3: Motion Mapping (Week 10-11)
 - [ ] Map hand/arm movements to avatar actions
 - [ ] Implement facial expression mapping
 - [ ] Create body position tracking for movement
@@ -76,7 +120,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Implement specific hand signals for UI navigation
 - [ ] Test and refine motion tracking accuracy
 
-### Step 2.4: Gesture Control System (Week 9-10)
+### Step 2.4: Gesture Control System (Week 11-12)
 - [ ] Implement hand gesture recognition for menu navigation
 - [ ] Create visual feedback system for recognized gestures
 - [ ] Add specific gestures for controlling game features
@@ -84,7 +128,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Create tutorial for teaching users the gesture controls
 - [ ] Test gesture recognition with different users
 
-### CHECKPOINT: Phase 2 Review
+### CHECKPOINT: Phase 2 Review (Week 12)
 - [ ] Conduct comprehensive code review
 - [ ] Test all Phase 2 functionality
 - [ ] Verify motion tracking accuracy and performance
@@ -94,7 +138,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 
 ## Phase 3: Game Mechanics Implementation
 
-### Step 3.1: Game Mode Framework (Week 11)
+### Step 3.1: Game Mode Framework (Week 13)
 - [ ] Design and implement game mode selection interface
 - [ ] Create base game mode class structure
 - [ ] Implement common game mechanics (timers, rounds, scoring)
@@ -102,7 +146,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Create shared UI components for all game modes
 - [ ] Test game mode framework functionality
 
-### Step 3.2: Boxing Game Mode (Week 12)
+### Step 3.2: Boxing Game Mode (Week 14)
 - [ ] Implement punch detection and classification (jab, hook, uppercut)
 - [ ] Create hit detection system
 - [ ] Add blocking and dodging mechanics
@@ -110,7 +154,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Create progressive damage visualization on avatars
 - [ ] Test boxing game mechanics for responsiveness
 
-### Step 3.3: Spell Casting Duel Game Mode (Week 13)
+### Step 3.3: Spell Casting Duel Game Mode (Week 15)
 - [ ] Implement hand gesture recognition for different spell types
 - [ ] Create mana/energy system with regeneration
 - [ ] Develop spell effects and animations
@@ -118,7 +162,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Add cooldown timers for powerful spells
 - [ ] Test spell casting mechanics and balance
 
-### Step 3.4: Ninja Reflex Game Mode (Week 14)
+### Step 3.4: Ninja Reflex Game Mode (Week 16)
 - [ ] Create visual prompt system for different gestures
 - [ ] Implement gesture recognition for catching, blocking, striking
 - [ ] Develop speed and accuracy scoring system
@@ -126,7 +170,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Implement combo and penalty systems
 - [ ] Test reaction timing and difficulty progression
 
-### Step 3.5: Rhythm Conductor Game Mode (Week 15)
+### Step 3.5: Rhythm Conductor Game Mode (Week 17)
 - [ ] Implement tempo and movement tracking
 - [ ] Create orchestral section controls
 - [ ] Develop precision and expressiveness scoring
@@ -134,7 +178,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Create visual feedback for orchestral responses
 - [ ] Test conducting mechanics and responsiveness
 
-### Step 3.6: Shadow Dance Game Mode (Week 16)
+### Step 3.6: Shadow Dance Game Mode (Week 18)
 - [ ] Implement movement mirroring mechanics
 - [ ] Create synchronization detection and scoring
 - [ ] Develop special move sequences and effects
@@ -142,14 +186,14 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Implement difficulty levels and freestyle mode
 - [ ] Test mirroring accuracy and responsiveness
 
-### Step 3.7: Voice Command Integration (Week 17)
+### Step 3.7: Voice Command Integration (Week 19)
 - [ ] Implement voice recognition system
 - [ ] Create voice command mappings for each game mode
 - [ ] Develop feedback for recognized commands
 - [ ] Add voice command tutorials
 - [ ] Test voice recognition accuracy and responsiveness
 
-### CHECKPOINT: Phase 3 Review
+### CHECKPOINT: Phase 3 Review (Week 19)
 - [ ] Conduct comprehensive code review
 - [ ] Test all game mechanics for balance and fun
 - [ ] Gather initial user feedback on gameplay
@@ -159,7 +203,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 
 ## Phase 4: Polish and Additional Features
 
-### Step 4.1: UI Refinement (Week 18)
+### Step 4.1: UI Refinement (Week 20)
 - [ ] Refine all UI elements for consistency
 - [ ] Implement responsive design for different screen sizes
 - [ ] Add animations and transitions to UI elements
@@ -167,7 +211,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Implement settings menu with customization options
 - [ ] Test UI usability with different users
 
-### Step 4.2: Social Features (Week 19)
+### Step 4.2: Social Features (Week 21)
 - [ ] Implement friend system
 - [ ] Add match history and statistics
 - [ ] Create leaderboards
@@ -175,7 +219,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Add player profiles with stats display
 - [ ] Test social features with multiple users
 
-### Step 4.3: Performance Optimization (Week 20)
+### Step 4.3: Performance Optimization (Week 22)
 - [ ] Profile and optimize CPU usage
 - [ ] Reduce memory footprint
 - [ ] Optimize network traffic
@@ -183,7 +227,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Add performance settings options
 - [ ] Test on various hardware configurations
 
-### Step 4.4: Audio System (Week 21)
+### Step 4.4: Audio System (Week 23)
 - [ ] Create sound effects for punches, blocks, and movements
 - [ ] Add ambient background music
 - [ ] Implement victory/defeat sound effects
@@ -191,7 +235,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Add voice chat enhancements
 - [ ] Test audio system quality and performance
 
-### CHECKPOINT: Phase 4 Review
+### CHECKPOINT: Phase 4 Review (Week 23)
 - [ ] Conduct comprehensive code review
 - [ ] Test all UI and social features
 - [ ] Verify performance optimizations
@@ -201,7 +245,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 
 ## Phase 5: Testing and Launch
 
-### Step 5.1: Comprehensive Testing (Week 22-23)
+### Step 5.1: Comprehensive Testing (Week 24-25)
 - [ ] Perform unit testing for all components
 - [ ] Conduct integration testing
 - [ ] Implement automated testing for critical paths
@@ -209,7 +253,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Test across different browsers and devices
 - [ ] Fix identified bugs and issues
 
-### Step 5.2: Beta Testing (Week 24)
+### Step 5.2: Beta Testing (Week 26)
 - [ ] Set up beta testing environment
 - [ ] Recruit beta testers
 - [ ] Create feedback collection system
@@ -217,7 +261,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Collect and analyze user feedback
 - [ ] Prioritize and implement critical improvements
 
-### Step 5.3: Final Polishing (Week 25)
+### Step 5.3: Final Polishing (Week 27)
 - [ ] Address all critical feedback from beta testing
 - [ ] Perform final optimization passes
 - [ ] Update documentation
@@ -225,7 +269,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Create onboarding experience for new users
 - [ ] Conduct final QA testing
 
-### Step 5.4: Launch (Week 26)
+### Step 5.4: Launch (Week 28)
 - [ ] Deploy to production environment
 - [ ] Implement monitoring and alerting systems
 - [ ] Create backup and recovery procedures
@@ -233,7 +277,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [ ] Monitor initial user adoption and feedback
 - [ ] Prepare for post-launch support
 
-### CHECKPOINT: Phase 5 Review
+### CHECKPOINT: Phase 5 Review (Week 28)
 - [ ] Conduct final project review
 - [ ] Document all completed features
 - [ ] Create maintenance plan for post-launch

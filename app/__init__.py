@@ -16,7 +16,12 @@ def create_app(config_name='development'):
     Application factory function to create and configure the Flask app
     """
     app = Flask(__name__)
-    app.config.from_object(config[config_name])
+
+    # Handle both string config names and direct config objects
+    if isinstance(config_name, str):
+        app.config.from_object(config[config_name])
+    else:
+        app.config.from_object(config_name)
 
     # Initialize extensions with app
     db.init_app(app)

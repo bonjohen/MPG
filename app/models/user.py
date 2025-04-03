@@ -64,7 +64,11 @@ class User(db.Model, UserMixin):
         """Verify that the reset token is valid and not expired"""
         if token != self.reset_token:
             return False
-        if self.reset_token_expiration < datetime.now(timezone.utc):
+        # Convert reset_token_expiration to timezone-aware datetime for comparison
+        if self.reset_token_expiration is None:
+            return False
+        expiration = self.reset_token_expiration.replace(tzinfo=timezone.utc)
+        if expiration < datetime.now(timezone.utc):
             return False
         return True
 

@@ -96,7 +96,14 @@ This project aims to create an interactive video chat application where users ca
 - WebRTC integration for video chat capabilities
 - Real-time animation system for avatar movements
 
-### 2. Backend
+### 2. Testing
+- Minimum 80% test coverage for all code
+- Comprehensive unit tests for all modules
+- Integration tests for critical user flows
+- Performance tests for real-time features
+- Automated test suite that can be run in CI/CD pipeline
+
+### 3. Backend
 - Server architecture to handle matchmaking and game sessions
 - WebSocket implementation for real-time communication
 - User authentication and account management
