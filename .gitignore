@@ -24,6 +24,13 @@ var/
 MPG_venv/
 venv/
 ENV/
+.venv/
+pyvenv.cfg
+pip-selfcheck.json
+Scripts/
+Lib/
+include/
+bin/
 
 # IDE
 .idea/
@@ -59,8 +66,40 @@ Thumbs.db
 *.avi
 *.mov
 *.webm
+*.mp3
+*.wav
+*.ogg
+*.flac
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
 uploads/
+app/static/uploads/
 
 # Temporary files
 tmp/
 temp/
+
+# Large files
+*.pyd
+*.dll
+*.so.*
+*.dylib
+
+# Compiled JavaScript
+*.min.js
+*.bundle.js
+
+# Coverage reports
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+.hypothesis/
+.coverage.*
+coverage.xml
+*.cover
