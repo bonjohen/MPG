@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+
+{% block title %}Motion Calibration - Motion Powered Games{% endblock %}
+
+{% block styles %}
+<style>
+    .calibration-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+    
+    .video-container {
+        position: relative;
+        width: 100%;
+        max-width: 640px;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #000;
+        margin-bottom: 20px;
+    }
+    
+    .video-container video {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .overlay-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+    
+    .calibration-step {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .calibration-progress {
+        width: 100%;
+        max-width: 640px;
+        margin-bottom: 20px;
+    }
+    
+    .gesture-indicators {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .gesture-indicator {
+        padding: 8px 16px;
+        border-radius: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        font-size: 14px;
+    }
+    
+    .gesture-indicator.detected {
+        background-color: #28a745;
+        color: white;
+        border-color: #28a745;
+    }
+    
+    .recommendations {
+        width: 100%;
+        max-width: 640px;
+    }
+    
+    .recommendation {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    
+    .recommendation.info {
+        background-color: #cff4fc;
+        border: 1px solid #9eeaf9;
+    }
+    
+    .recommendation.warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffecb5;
+    }
+    
+    .recommendation.error {
+        background-color: #f8d7da;
+        border: 1px solid #f5c2c7;
+    }
+    
+    .timer-container {
+        width: 60px;
+        height: 60px;
+        position: relative;
+        margin: 0 auto 20px;
+    }
+    
+    .timer-circle {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(#3a0ca3 0%, #f8f9fa 0%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Motion Calibration</h2>
+            </div>
+            <div class="card-body calibration-container">
+                <div class="video-container">
+                    <video id="calibrationVideo" autoplay muted playsinline></video>
+                    <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+                </div>
+                
+                <div class="calibration-step">
+                    <div class="timer-container">
+                        <div id="timerCircle" class="timer-circle">5</div>
+                    </div>
+                    <h3 id="stepTitle">Preparing Calibration</h3>
+                    <p id="stepInstructions">Please wait while we set up the calibration process...</p>
+                </div>
+                
+                <div class="calibration-progress">
+                    <div class="progress">
+                        <div id="progressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                    <div class="text-center mt-2">
+                        <small id="progressText">Step 0 of 7</small>
+                    </div>
+                </div>
+                
+                <div id="gestureIndicators" class="gesture-indicators">
+                    <!-- Gesture indicators will be added dynamically -->
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4">
+                    <button id="startCalibrationBtn" class="btn btn-primary">Start Calibration</button>
+                    <button id="skipCalibrationBtn" class="btn btn-outline-secondary">Skip Calibration</button>
+                </div>
+                
+                <div id="recommendations" class="recommendations d-none">
+                    <h4>Recommendations</h4>
+                    <div id="recommendationsList">
+                        <!-- Recommendations will be added dynamically -->
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                        <button id="continueBtn" class="btn btn-success">Continue to Game</button>
+                        <button id="recalibrateBtn" class="btn btn-outline-primary">Recalibrate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- MediaPipe and TensorFlow.js dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/hand-pose-detection@2.0.0/dist/hand-pose-detection.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.0.0/dist/pose-detection.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.2/dist/face-landmarks-detection.min.js"></script>
+
+<!-- Custom JS -->
+<script src="{{ url_for('static', filename='js/motion-tracking.js') }}"></script>
+<script src="{{ url_for('static', filename='js/gesture-recognition.js') }}"></script>
+<script src="{{ url_for('static', filename='js/motion-calibration.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOM elements
+        const calibrationVideo = document.getElementById('calibrationVideo');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const stepTitle = document.getElementById('stepTitle');
+        const stepInstructions = document.getElementById('stepInstructions');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const gestureIndicators = document.getElementById('gestureIndicators');
+        const timerCircle = document.getElementById('timerCircle');
+        const startCalibrationBtn = document.getElementById('startCalibrationBtn');
+        const skipCalibrationBtn = document.getElementById('skipCalibrationBtn');
+        const recommendations = document.getElementById('recommendations');
+        const recommendationsList = document.getElementById('recommendationsList');
+        const continueBtn = document.getElementById('continueBtn');
+        const recalibrateBtn = document.getElementById('recalibrateBtn');
+        
+        // Canvas context
+        const ctx = overlayCanvas.getContext('2d');
+        
+        // Timer variables
+        let timerInterval = null;
+        let timeRemaining = 0;
+        
+        // Initialize video stream
+        async function initializeVideo() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                });
+                
+                calibrationVideo.srcObject = stream;
+                
+                // Set canvas dimensions after video loads
+                calibrationVideo.onloadedmetadata = () => {
+                    overlayCanvas.width = calibrationVideo.videoWidth;
+                    overlayCanvas.height = calibrationVideo.videoHeight;
+                };
+                
+                return true;
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                alert('Unable to access your camera. Please ensure you have granted camera permissions and try again.');
+                return false;
+            }
+        }
+        
+        // Initialize motion tracking and calibration
+        async function initializeTracking() {
+            try {
+                // Initialize motion tracking
+                const motionTracker = await initMotionTracking({
+                    videoElementId: 'calibrationVideo',
+                    canvasElementId: 'overlayCanvas',
+                    debugMode: true,
+                    autoStart: false
+                });
+                
+                // Initialize gesture recognition
+                const gestureRecognizer = initGestureRecognition({}, motionTracker);
+                
+                // Initialize calibration
+                const calibration = initCalibration({}, motionTracker, gestureRecognizer);
+                
+                // Set up calibration callbacks
+                calibration.setCallbacks({
+                    onStepStart: handleStepStart,
+                    onStepComplete: handleStepComplete,
+                    onCalibrationComplete: handleCalibrationComplete,
+                    onCalibrationUpdate: handleCalibrationUpdate
+                });
+                
+                return calibration;
+            } catch (error) {
+                console.error('Error initializing tracking:', error);
+                alert('There was an error initializing motion tracking. Please try again later.');
+                return null;
+            }
+        }
+        
+        // Handle calibration step start
+        function handleStepStart(step, stepIndex) {
+            // Update UI with step information
+            stepTitle.textContent = step.title;
+            stepInstructions.textContent = step.instructions;
+            
+            // Update progress
+            const progress = ((stepIndex + 1) / 7) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute('aria-valuenow', progress);
+            progressBar.textContent = `${Math.round(progress)}%`;
+            progressText.textContent = `Step ${stepIndex + 1} of 7`;
+            
+            // Create gesture indicators
+            gestureIndicators.innerHTML = '';
+            step.requiredGestures.forEach(gesture => {
+                const indicator = document.createElement('div');
+                indicator.className = 'gesture-indicator';
+                indicator.id = `gesture-${gesture}`;
+                indicator.textContent = formatGestureName(gesture);
+                gestureIndicators.appendChild(indicator);
+            });
+            
+            // Start timer
+            timeRemaining = step.timeRequired;
+            updateTimer(timeRemaining, step.timeRequired);
+            
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(() => {
+                timeRemaining -= 0.1;
+                updateTimer(timeRemaining, step.timeRequired);
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 100);
+        }
+        
+        // Handle calibration step complete
+        function handleStepComplete(step, stepIndex, allGesturesDetected) {
+            // Clear timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+        
+        // Handle calibration complete
+        function handleCalibrationComplete(calibrationData) {
+            // Hide calibration UI
+            document.querySelector('.calibration-step').classList.add('d-none');
+            document.querySelector('.calibration-progress').classList.add('d-none');
+            gestureIndicators.classList.add('d-none');
+            startCalibrationBtn.classList.add('d-none');
+            skipCalibrationBtn.classList.add('d-none');
+            
+            // Show recommendations
+            recommendations.classList.remove('d-none');
+            
+            // Add recommendations to UI
+            recommendationsList.innerHTML = '';
+            calibrationData.recommendations.forEach(recommendation => {
+                const recommendationEl = document.createElement('div');
+                recommendationEl.className = `recommendation ${recommendation.severity}`;
+                recommendationEl.textContent = recommendation.message;
+                recommendationsList.appendChild(recommendationEl);
+            });
+            
+            // Store calibration data in session storage
+            sessionStorage.setItem('calibrationData', JSON.stringify(calibrationData));
+        }
+        
+        // Handle calibration update
+        function handleCalibrationUpdate(update) {
+            // Update gesture indicators
+            Object.keys(update.detectedGestures).forEach(gesture => {
+                const detected = update.detectedGestures[gesture];
+                const indicator = document.getElementById(`gesture-${gesture}`);
+                
+                if (indicator) {
+                    if (detected) {
+                        indicator.classList.add('detected');
+                    } else {
+                        indicator.classList.remove('detected');
+                    }
+                }
+            });
+        }
+        
+        // Update timer display
+        function updateTimer(current, total) {
+            timerCircle.textContent = Math.ceil(current);
+            
+            // Update timer circle gradient
+            const percentage = (current / total) * 100;
+            timerCircle.style.background = `conic-gradient(#3a0ca3 ${percentage}%, #f8f9fa 0%)`;
+        }
+        
+        // Format gesture name for display
+        function formatGestureName(gesture) {
+            return gesture
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+        
+        // Initialize everything
+        let calibration = null;
+        
+        async function initialize() {
+            const videoInitialized = await initializeVideo();
+            
+            if (videoInitialized) {
+                calibration = await initializeTracking();
+                
+                if (calibration) {
+                    startCalibrationBtn.disabled = false;
+                } else {
+                    alert('Failed to initialize motion tracking. Please refresh the page and try again.');
+                }
+            }
+        }
+        
+        // Event listeners
+        startCalibrationBtn.addEventListener('click', function() {
+            if (calibration) {
+                this.disabled = true;
+                skipCalibrationBtn.disabled = true;
+                calibration.startCalibration();
+            }
+        });
+        
+        skipCalibrationBtn.addEventListener('click', function() {
+            window.location.href = '{{ url_for("game.lobby") }}';
+        });
+        
+        continueBtn.addEventListener('click', function() {
+            window.location.href = '{{ url_for("game.lobby") }}';
+        });
+        
+        recalibrateBtn.addEventListener('click', function() {
+            // Hide recommendations
+            recommendations.classList.add('d-none');
+            
+            // Show calibration UI
+            document.querySelector('.calibration-step').classList.remove('d-none');
+            document.querySelector('.calibration-progress').classList.remove('d-none');
+            gestureIndicators.classList.remove('d-none');
+            startCalibrationBtn.classList.remove('d-none');
+            skipCalibrationBtn.classList.remove('d-none');
+            
+            // Reset buttons
+            startCalibrationBtn.disabled = false;
+            skipCalibrationBtn.disabled = false;
+        });
+        
+        // Start initialization
+        initialize();
+    });
+</script>
+{% endblock %}

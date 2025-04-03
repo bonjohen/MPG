@@ -25,6 +25,12 @@ def avatars():
     """Render the avatar selection page"""
     return render_template('game/avatars.html')
 
+@game.route('/calibration')
+@login_required
+def calibration():
+    """Render the motion calibration page"""
+    return render_template('game/calibration.html')
+
 # Socket.IO event handlers
 @socketio.on('connect')
 def handle_connect():

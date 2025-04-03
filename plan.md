@@ -151,6 +151,7 @@ This project aims to create an interactive video chat application where users ca
 - ✓ Implement basic video chat functionality
 - ✓ Set up user authentication
 - ✓ Create simple UI framework
+- ✓ Implement automatic admin login via configuration
 
 ### Phase 2: Avatar and Motion Tracking
 - Develop avatar overlay system

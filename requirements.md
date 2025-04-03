@@ -102,13 +102,21 @@ This project aims to create an interactive video chat application where users ca
 - User authentication and account management
 - Game state synchronization between players
 
-### 3. Computer Vision
+### 3. User Authentication
+- User registration and login system
+- Secure password storage with hashing
+- Session management
+- User profiles with game statistics
+- Password reset functionality
+- Automatic login with administrative rights via configuration setting (default enabled)
+
+### 4. Computer Vision
 - Machine learning models for pose estimation
 - Hand tracking algorithms with high accuracy
 - Facial landmark detection for expression recognition
 - Optimization for various lighting conditions and backgrounds
 
-### 4. Performance
+### 5. Performance
 - Minimum 30 FPS for smooth gameplay
 - Efficient bandwidth usage for video streaming
 - Graceful degradation on lower-end hardware
