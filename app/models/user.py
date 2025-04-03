@@ -1,4 +1,5 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import secrets
 from flask_login import UserMixin
 from app import db, login_manager
 
@@ -17,6 +18,10 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     last_seen = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    # Password reset fields
+    reset_token = db.Column(db.String(100), nullable=True)
+    reset_token_expiration = db.Column(db.DateTime, nullable=True)
 
     # Profile information
     avatar_id = db.Column(db.Integer, db.ForeignKey('avatars.id', name='fk_user_avatar_id'), nullable=True)
@@ -47,3 +52,29 @@ class User(db.Model, UserMixin):
         """Update the last seen timestamp"""
         self.last_seen = datetime.now(timezone.utc)
         db.session.commit()
+
+    def generate_reset_token(self):
+        """Generate a password reset token that expires in 1 hour"""
+        self.reset_token = secrets.token_urlsafe(32)
+        self.reset_token_expiration = datetime.now(timezone.utc) + timedelta(hours=1)
+        db.session.commit()
+        return self.reset_token
+
+    def verify_reset_token(self, token):
+        """Verify that the reset token is valid and not expired"""
+        if token != self.reset_token:
+            return False
+        if self.reset_token_expiration < datetime.now(timezone.utc):
+            return False
+        return True
+
+    def clear_reset_token(self):
+        """Clear the reset token after it has been used"""
+        self.reset_token = None
+        self.reset_token_expiration = None
+        db.session.commit()
+
+    @staticmethod
+    def get_user_by_email(email):
+        """Get a user by their email address"""
+        return User.query.filter_by(email=email).first()

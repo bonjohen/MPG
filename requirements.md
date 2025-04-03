@@ -1,7 +1,7 @@
 # Motion Powered Games Requirements
 
 ## Project Overview
-This project aims to create an interactive video chat application where users can engage in various motion-based games while being represented by customizable avatars. The application will use computer vision to track players' movements, gestures, and facial expressions, translating them into in-game actions. Players can choose from multiple game modes, each offering unique gameplay experiences based on different motion mechanics.
+This project aims to create an interactive video chat application where users can engage in various motion-based games while being represented by customizable avatars. The application will use computer vision to track players' movements, gestures, and facial expressions, translating them into in-game actions. Players can choose from multiple game modes, each offering unique gameplay experiences based on different motion mechanics. The focus is on epic battles, magical spellcasting, and other immersive experiences that transform physical movements into powerful in-game actions.
 
 ## Core Features
 

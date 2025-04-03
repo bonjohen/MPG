@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block title %}Game Match - Motion Powered Games{% endblock %}
+
+{% block styles %}
+<style>
+    .video-container {
+        position: relative;
+        width: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #000;
+        margin-bottom: 20px;
+    }
+    
+    .video-container video {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .local-video-container {
+        position: relative;
+        width: 100%;
+        max-width: 320px;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #000;
+        margin-bottom: 20px;
+    }
+    
+    .local-video-container video {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .video-controls {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 5px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 5px;
+    }
+    
+    .video-controls button {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .video-controls button:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .video-controls button.active {
+        background-color: #dc3545;
+    }
+    
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 200px);
+    }
+    
+    .game-area {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    
+    .game-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+    
+    .game-controls {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .health-bar {
+        height: 20px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    .health-bar-fill {
+        height: 100%;
+        background-color: #28a745;
+        transition: width 0.3s ease;
+    }
+    
+    .bandwidth-controls {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .remote-videos-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .remote-video {
+        width: 100%;
+        max-width: 320px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    @media (max-width: 768px) {
+        .game-container {
+            height: auto;
+        }
+        
+        .game-area {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="game-container">
+            <div class="game-area">
+                <div id="remoteVideos" class="remote-videos-container">
+                    <!-- Remote videos will be added here dynamically -->
+                </div>
+                <div class="game-overlay" id="gameOverlay">
+                    <!-- Game elements will be added here dynamically -->
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Your Health</h5>
+                    <div class="health-bar">
+                        <div class="health-bar-fill" id="playerHealth" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5>Opponent Health</h5>
+                    <div class="health-bar">
+                        <div class="health-bar-fill" id="opponentHealth" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button id="startGameBtn" class="btn btn-primary">Start Game</button>
+                <button id="leaveGameBtn" class="btn btn-danger">Leave Game</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="local-video-container">
+            <video id="localVideo" autoplay muted playsinline></video>
+            <div class="video-controls">
+                <button id="toggleMuteBtn" title="Mute/Unmute">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button id="toggleVideoBtn" title="Turn Camera On/Off">
+                    <i class="fas fa-video"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Bandwidth Settings</h5>
+            </div>
+            <div class="card-body">
+                <p>Adjust video quality based on your connection:</p>
+                <div class="bandwidth-controls">
+                    <button id="lowBandwidthBtn" class="btn btn-outline-secondary">Low</button>
+                    <button id="mediumBandwidthBtn" class="btn btn-outline-primary active">Medium</button>
+                    <button id="highBandwidthBtn" class="btn btn-outline-secondary">High</button>
+                </div>
+                <div class="form-text text-muted">
+                    <small>Current bandwidth usage: <span id="bandwidthUsage">Medium (500 kbps)</span></small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Game Chat</h5>
+            </div>
+            <div class="card-body">
+                <div id="gameChat" class="lobby-chat border rounded p-2 mb-3" style="height: 200px; overflow-y: auto;">
+                    <!-- Chat messages will be populated here via JavaScript -->
+                    <div class="text-center text-muted py-5">
+                        <p>Chat messages will appear here</p>
+                    </div>
+                </div>
+                <form id="chatForm" class="d-flex">
+                    <input type="text" id="chatMessage" class="form-control me-2" placeholder="Type a message...">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<!-- Video Chat JS -->
+<script src="{{ url_for('static', filename='js/video-chat.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Socket.IO
+        const socket = io();
+        
+        // Initialize video chat
+        const videoChat = initVideoChat({
+            localVideoId: 'localVideo',
+            remoteVideoContainer: 'remoteVideos',
+            socketInstance: socket,
+            autoStart: true,
+            bandwidthProfile: 'medium'
+        });
+        
+        // Join game session
+        socket.emit('join_game', {
+            session_id: '{{ session.id }}'
+        });
+        
+        // Handle game messages
+        socket.on('game_message', function(data) {
+            addChatMessage(data.msg);
+        });
+        
+        // Handle game actions
+        socket.on('game_action', function(data) {
+            handleGameAction(data);
+        });
+        
+        // Handle user joined
+        socket.on('user_joined', function(data) {
+            addChatMessage(`${data.username} has joined the game`);
+            videoChat.connectToUser(data.user_id);
+        });
+        
+        // Handle user left
+        socket.on('user_left', function(data) {
+            addChatMessage(`${data.username} has left the game`);
+            videoChat.disconnectFromUser(data.user_id);
+        });
+        
+        // UI Event Handlers
+        document.getElementById('toggleMuteBtn').addEventListener('click', function() {
+            const muted = videoChat.toggleMute();
+            this.innerHTML = muted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
+            this.classList.toggle('active', muted);
+        });
+        
+        document.getElementById('toggleVideoBtn').addEventListener('click', function() {
+            const videoEnabled = videoChat.toggleVideo();
+            this.innerHTML = videoEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+            this.classList.toggle('active', !videoEnabled);
+        });
+        
+        document.getElementById('lowBandwidthBtn').addEventListener('click', function() {
+            videoChat.setBandwidthProfile('low');
+            updateBandwidthUI('low');
+        });
+        
+        document.getElementById('mediumBandwidthBtn').addEventListener('click', function() {
+            videoChat.setBandwidthProfile('medium');
+            updateBandwidthUI('medium');
+        });
+        
+        document.getElementById('highBandwidthBtn').addEventListener('click', function() {
+            videoChat.setBandwidthProfile('high');
+            updateBandwidthUI('high');
+        });
+        
+        document.getElementById('startGameBtn').addEventListener('click', function() {
+            socket.emit('start_game', {
+                session_id: '{{ session.id }}'
+            });
+        });
+        
+        document.getElementById('leaveGameBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to leave the game?')) {
+                socket.emit('leave_game', {
+                    session_id: '{{ session.id }}'
+                });
+                window.location.href = '{{ url_for("game.lobby") }}';
+            }
+        });
+        
+        document.getElementById('chatForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const messageInput = document.getElementById('chatMessage');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                socket.emit('game_chat', {
+                    session_id: '{{ session.id }}',
+                    message: message
+                });
+                messageInput.value = '';
+            }
+        });
+        
+        // Helper Functions
+        function addChatMessage(message) {
+            const chatContainer = document.getElementById('gameChat');
+            
+            // Clear placeholder if it exists
+            if (chatContainer.querySelector('.text-center')) {
+                chatContainer.innerHTML = '';
+            }
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = 'mb-2';
+            messageElement.innerHTML = `
+                <small class="text-muted">${new Date().toLocaleTimeString()}</small>
+                <div>${message}</div>
+            `;
+            
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function handleGameAction(data) {
+            const { action_type, action_data, username } = data;
+            
+            switch (action_type) {
+                case 'punch':
+                    // Handle punch action
+                    addChatMessage(`${username} threw a ${action_data.type} punch!`);
+                    updateHealth(action_data.target, action_data.damage);
+                    break;
+                    
+                case 'block':
+                    // Handle block action
+                    addChatMessage(`${username} blocked an attack!`);
+                    break;
+                    
+                case 'game_start':
+                    // Handle game start
+                    addChatMessage('The game has started!');
+                    break;
+                    
+                case 'game_end':
+                    // Handle game end
+                    addChatMessage(`Game over! ${action_data.winner} wins!`);
+                    break;
+                    
+                default:
+                    console.log('Unknown game action:', action_type);
+            }
+        }
+        
+        function updateHealth(target, damage) {
+            const healthBar = document.getElementById(target === 'player' ? 'playerHealth' : 'opponentHealth');
+            const currentWidth = parseFloat(healthBar.style.width);
+            const newWidth = Math.max(0, currentWidth - damage);
+            
+            healthBar.style.width = `${newWidth}%`;
+            
+            if (newWidth <= 30) {
+                healthBar.style.backgroundColor = '#dc3545';
+            } else if (newWidth <= 60) {
+                healthBar.style.backgroundColor = '#ffc107';
+            }
+        }
+        
+        function updateBandwidthUI(profile) {
+            // Update active button
+            document.querySelectorAll('.bandwidth-controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(`${profile}BandwidthBtn`).classList.add('active');
+            
+            // Update bandwidth usage text
+            const usageText = {
+                low: 'Low (250 kbps)',
+                medium: 'Medium (500 kbps)',
+                high: 'High (1000 kbps)'
+            };
+            
+            document.getElementById('bandwidthUsage').textContent = usageText[profile];
+        }
+    });
+</script>
+{% endblock %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
 from app import socketio, db
@@ -31,6 +31,9 @@ def handle_connect():
     """Handle client connection"""
     if current_user.is_authenticated:
         emit('user_connected', {'user_id': current_user.id, 'username': current_user.username})
+
+        # Update last seen timestamp
+        current_user.update_last_seen()
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -72,7 +75,7 @@ def handle_game_action(data):
     session_id = data.get('session_id')
     action_type = data.get('action_type')
     action_data = data.get('action_data', {})
-    
+
     if session_id and action_type:
         # Broadcast the action to all players in the session
         emit('game_action', {
@@ -81,3 +84,55 @@ def handle_game_action(data):
             'action_type': action_type,
             'action_data': action_data
         }, room=session_id)
+
+# WebRTC signaling
+@socketio.on('call-user')
+def handle_call_user(data):
+    """Handle call user request"""
+    if current_user.is_authenticated:
+        to = data.get('to')
+        offer = data.get('offer')
+
+        if to and offer:
+            emit('call-made', {
+                'offer': offer,
+                'socket': request.sid
+            }, room=to)
+
+@socketio.on('make-answer')
+def handle_make_answer(data):
+    """Handle make answer request"""
+    if current_user.is_authenticated:
+        to = data.get('to')
+        answer = data.get('answer')
+
+        if to and answer:
+            emit('answer-made', {
+                'answer': answer,
+                'socket': request.sid
+            }, room=to)
+
+@socketio.on('ice-candidate')
+def handle_ice_candidate(data):
+    """Handle ICE candidate"""
+    if current_user.is_authenticated:
+        to = data.get('to')
+        candidate = data.get('candidate')
+
+        if to and candidate:
+            emit('ice-candidate', {
+                'candidate': candidate,
+                'socket': request.sid
+            }, room=to)
+
+@socketio.on('game_chat')
+def handle_game_chat(data):
+    """Handle game chat message"""
+    if current_user.is_authenticated:
+        session_id = data.get('session_id')
+        message = data.get('message')
+
+        if session_id and message:
+            emit('game_message', {
+                'msg': f'{current_user.username}: {message}'
+            }, room=session_id)
