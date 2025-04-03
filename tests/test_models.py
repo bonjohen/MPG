@@ -169,3 +169,117 @@ def test_game_session_to_dict(app):
         assert completed_dict['status'] == 'completed'
         assert completed_dict['winner_id'] == user.id
         assert 'ended_at' in completed_dict
+
+
+def test_game_session_advanced(app):
+    """Test advanced GameSession functionality."""
+    with app.app_context():
+        # Get the test user
+        user = db.session.execute(db.select(db.Model.metadata.tables['users']).where(
+            db.Model.metadata.tables['users'].c.username == 'testuser'
+        )).fetchone()
+
+        # Create a new game session
+        session = GameSession(
+            player1_id=user.id,
+            status='waiting'
+        )
+        db.session.add(session)
+        db.session.commit()
+
+        # Test start_game method
+        session.start_game()
+        db.session.commit()
+        assert session.status == 'playing'
+        assert session.started_at is not None
+
+        # Test update_score method
+        session.update_score(1, 5)
+        db.session.commit()
+        assert session.player1_score == 5
+
+        session.update_score(2, 3)
+        db.session.commit()
+        assert session.player2_score == 3
+
+        # Test end_game method
+        session.end_game(user.id)
+        db.session.commit()
+        assert session.status == 'completed'
+        assert session.ended_at is not None
+        assert session.winner_id == user.id
+
+        # Test get_winner method
+        winner = session.get_winner()
+        assert winner.id == user.id
+
+        # Test get_duration method
+        duration = session.get_duration()
+        assert isinstance(duration, int)
+        assert duration >= 0
+
+
+def test_game_session_edge_cases(app):
+    """Test edge cases for GameSession functionality."""
+    with app.app_context():
+        # Get the test user
+        user = db.session.execute(db.select(db.Model.metadata.tables['users']).where(
+            db.Model.metadata.tables['users'].c.username == 'testuser'
+        )).fetchone()
+
+        # Create a new game session
+        session = GameSession(
+            player1_id=user.id,
+            status='waiting'
+        )
+        db.session.add(session)
+        db.session.commit()
+
+        # Test get_duration with no start/end time
+        duration = session.get_duration()
+        assert duration == 0
+
+        # Test get_winner with no winner
+        winner = session.get_winner()
+        assert winner is None
+
+        # Test end_game with no winner specified (tie game)
+        session.player1_score = 5
+        session.player2_score = 5
+        session.end_game()
+        db.session.commit()
+        assert session.status == 'completed'
+        assert session.ended_at is not None
+        assert session.winner_id is None  # No winner for a tie
+
+        # Test end_game with player 1 winning
+        session = GameSession(
+            player1_id=user.id,
+            player2_id=user.id,
+            status='playing',
+            player1_score=10,
+            player2_score=5
+        )
+        db.session.add(session)
+        db.session.commit()
+
+        session.end_game()
+        db.session.commit()
+        assert session.status == 'completed'
+        assert session.winner_id == user.id
+
+        # Test end_game with player 2 winning
+        session = GameSession(
+            player1_id=user.id,
+            player2_id=user.id,
+            status='playing',
+            player1_score=5,
+            player2_score=10
+        )
+        db.session.add(session)
+        db.session.commit()
+
+        session.end_game()
+        db.session.commit()
+        assert session.status == 'completed'
+        assert session.winner_id == user.id

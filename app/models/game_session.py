@@ -44,6 +44,47 @@ class GameSession(db.Model):
             'player2_score': self.player2_score
         }
 
+    def start_game(self):
+        """Start the game session"""
+        from datetime import datetime
+        self.status = 'playing'
+        self.started_at = datetime.now()
+
+    def update_score(self, player, score):
+        """Update the score for a player"""
+        if player == 1:
+            self.player1_score = score
+        elif player == 2:
+            self.player2_score = score
+        else:
+            raise ValueError("Invalid player number. Must be 1 or 2.")
+
+    def end_game(self, winner_id=None):
+        """End the game session"""
+        from datetime import datetime
+        self.status = 'completed'
+        self.ended_at = datetime.now()
+
+        if winner_id:
+            self.winner_id = winner_id
+        elif self.player1_score > self.player2_score:
+            self.winner_id = self.player1_id
+        elif self.player2_score > self.player1_score:
+            self.winner_id = self.player2_id
+
+    def get_winner(self):
+        """Get the winner of the game"""
+        from app.models.user import User
+        if self.winner_id:
+            return User.query.get(self.winner_id)
+        return None
+
+    def get_duration(self):
+        """Get the duration of the game in seconds"""
+        if self.started_at and self.ended_at:
+            return int((self.ended_at - self.started_at).total_seconds())
+        return 0
+
     def __repr__(self):
         return f'<GameSession {self.id}>'
 

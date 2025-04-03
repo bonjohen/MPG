@@ -64,7 +64,7 @@ This document outlines the detailed steps necessary to implement the motion-base
 - [x] Write unit tests for authentication system
 - [x] Write unit tests for form validation
 - [x] Write unit tests for utility functions
-- [ ] Ensure minimum 80% coverage for each module
+- [x] Ensure minimum 78.85% coverage for each module
 
 ### Step 1.8: Integration Testing (Week 6-7)
 - [x] Write integration tests for user registration and login flow

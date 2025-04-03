@@ -260,3 +260,19 @@ def api_ice_candidate():
     # In a real application, this would emit a socket.io event
     # For testing purposes, we'll just return success
     return jsonify({'success': True})
+
+
+@game.route('/play/<int:session_id>')
+@login_required
+def play_game(session_id):
+    """Render the game page for a specific session"""
+    session = GameSession.query.get_or_404(session_id)
+    return render_template('game/play.html', session=session)
+
+
+@game.route('/results/<int:session_id>')
+@login_required
+def game_results(session_id):
+    """Render the game results page for a specific session"""
+    session = GameSession.query.get_or_404(session_id)
+    return render_template('game/results.html', session=session)

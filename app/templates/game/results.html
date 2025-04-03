@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Game Results - Motion Powered Games{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="mb-0">Game Results</h1>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h2>Session #{{ session.id }}</h2>
+                        <p class="text-muted">
+                            {% if session.started_at %}
+                                Started: {{ session.started_at.strftime('%B %d, %Y at %I:%M %p') }}<br>
+                            {% endif %}
+                            {% if session.ended_at %}
+                                Ended: {{ session.ended_at.strftime('%B %d, %Y at %I:%M %p') }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-5 text-center">
+                            <div class="card h-100 {% if session.player1_score > session.player2_score %}bg-success text-white{% else %}bg-light{% endif %}">
+                                <div class="card-body">
+                                    <h3>Player 1</h3>
+                                    <h1 class="display-1">{{ session.player1_score or 0 }}</h1>
+                                    {% if session.player1_id == session.winner_id %}
+                                        <span class="badge bg-warning text-dark">Winner</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-2 text-center d-flex align-items-center justify-content-center">
+                            <h2>VS</h2>
+                        </div>
+                        
+                        <div class="col-md-5 text-center">
+                            <div class="card h-100 {% if session.player2_score > session.player1_score %}bg-success text-white{% else %}bg-light{% endif %}">
+                                <div class="card-body">
+                                    <h3>Player 2</h3>
+                                    <h1 class="display-1">{{ session.player2_score or 0 }}</h1>
+                                    {% if session.player2_id == session.winner_id %}
+                                        <span class="badge bg-warning text-dark">Winner</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3>Game Statistics</h3>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Statistic</th>
+                                        <th>Player 1</th>
+                                        <th>Player 2</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Score</td>
+                                        <td>{{ session.player1_score or 0 }}</td>
+                                        <td>{{ session.player2_score or 0 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Accuracy</td>
+                                        <td>75%</td>
+                                        <td>68%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reaction Time</td>
+                                        <td>0.8s</td>
+                                        <td>0.9s</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Combos</td>
+                                        <td>12</td>
+                                        <td>8</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <h3>
+                            {% if session.player1_score == session.player2_score %}
+                                It's a draw!
+                            {% elif session.player1_score > session.player2_score %}
+                                Player 1 wins!
+                            {% else %}
+                                Player 2 wins!
+                            {% endif %}
+                        </h3>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('game.lobby') }}" class="btn btn-secondary">Back to Lobby</a>
+                        <a href="{{ url_for('game.play_game', session_id=session.id) }}" class="btn btn-primary">Play Again</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

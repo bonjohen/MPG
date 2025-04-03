@@ -221,6 +221,18 @@ def test_socket_events(client, auth, app):
         data = response.get_json()
         assert data['success'] is True
 
+        # Test with missing parameters
+        response = test_client.post(
+            '/game/api/call-user',
+            json={
+                'to': 'user123'
+                # Missing offer
+            }
+        )
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['success'] is False
+
     # Test make-answer endpoint
     with app.test_client() as test_client:
         with test_client.session_transaction() as sess:
@@ -237,6 +249,18 @@ def test_socket_events(client, auth, app):
         data = response.get_json()
         assert data['success'] is True
 
+        # Test with missing parameters
+        response = test_client.post(
+            '/game/api/make-answer',
+            json={
+                'to': 'user123'
+                # Missing answer
+            }
+        )
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['success'] is False
+
     # Test ice-candidate endpoint
     with app.test_client() as test_client:
         with test_client.session_transaction() as sess:
@@ -252,3 +276,121 @@ def test_socket_events(client, auth, app):
         assert response.status_code == 200
         data = response.get_json()
         assert data['success'] is True
+
+        # Test with missing parameters
+        response = test_client.post(
+            '/game/api/ice-candidate',
+            json={
+                'to': 'user123'
+                # Missing candidate
+            }
+        )
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['success'] is False
+
+
+def test_game_session_api(client, auth, app):
+    """Test game session API endpoints."""
+    # Login
+    auth.login()
+
+    # Test creating a game session with invalid data
+    response = client.post(
+        '/game/api/create_session',
+        json={}
+    )
+    assert response.status_code == 200  # Still returns 200 as we don't validate input
+    data = response.get_json()
+    assert data['success'] is True
+
+    # Create a valid game session
+    response = client.post(
+        '/game/api/create_session',
+        json={
+            'player2_id': None,
+            'status': 'waiting'
+        }
+    )
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['success'] is True
+    session_id = data['session_id']
+
+    # Test joining a game session with missing session_id
+    response = client.post(
+        '/game/api/join_session',
+        json={}
+    )
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['success'] is False
+
+    # Test joining a non-existent game session
+    response = client.post(
+        '/game/api/join_session',
+        json={'session_id': 9999}
+    )
+    assert response.status_code == 404
+    data = response.get_json()
+    assert data['success'] is False
+
+    # Test joining a valid game session
+    response = client.post(
+        '/game/api/join_session',
+        json={'session_id': session_id}
+    )
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['success'] is True
+
+    # Test joining a game session that's already in progress
+    response = client.post(
+        '/game/api/join_session',
+        json={'session_id': session_id}
+    )
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['success'] is False
+
+    # Test updating avatar with missing avatar_id
+    response = client.post(
+        '/game/api/update_avatar',
+        json={}
+    )
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['success'] is False
+
+    # Test updating avatar with non-existent avatar_id
+    response = client.post(
+        '/game/api/update_avatar',
+        json={'avatar_id': 9999}
+    )
+    assert response.status_code == 404
+    data = response.get_json()
+    assert data['success'] is False
+
+
+def test_game_routes(client, auth, app):
+    """Test additional game routes."""
+    # Login
+    auth.login()
+
+    # Test game page route
+    response = client.get('/game/play/1')
+    assert response.status_code == 200
+    assert b'Game Session' in response.data
+
+    # Test game page route with non-existent session
+    response = client.get('/game/play/9999')
+    assert response.status_code == 404
+
+    # Test game results route
+    response = client.get('/game/results/1')
+    assert response.status_code == 200
+    assert b'Game Results' in response.data
+
+    # Test game results route with non-existent session
+    response = client.get('/game/results/9999')
+    assert response.status_code == 404
