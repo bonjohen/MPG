@@ -7,13 +7,13 @@ gunicorn==21.2.0
 
 # Computer Vision and ML
 opencv-python==4.8.1.78
-mediapipe==0.10.8
-tensorflow==2.15.0
+mediapipe==0.10.14
+tensorflow==2.17.0
 numpy==1.26.0
 
 # WebRTC and Video Processing
 aiortc==1.5.0
-av==11.0.0
+av<11.0.0,>=9.0.0
 
 # Authentication and User Management
 Flask-Login==0.6.3
