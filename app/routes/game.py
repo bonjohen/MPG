@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
@@ -212,6 +213,67 @@ def api_update_avatar():
     db.session.commit()
 
     return jsonify({'success': True})
+
+
+@game.route('/api/save_avatar_customization', methods=['POST'])
+@login_required
+def api_save_avatar_customization():
+    """API endpoint to save avatar customization"""
+    data = request.get_json()
+    avatar_id = data.get('avatarId')
+    color = data.get('color')
+    accessories = data.get('accessories', [])
+    animation = data.get('animation')
+
+    if not avatar_id:
+        return jsonify({'success': False, 'error': 'Avatar ID is required'}), 400
+
+    # Find the avatar
+    avatar = Avatar.query.get(avatar_id)
+
+    if not avatar:
+        return jsonify({'success': False, 'error': 'Avatar not found'}), 404
+
+    # Update the avatar with customization data
+    # In a real application, you would store this in a separate table
+    # For now, we'll just update the avatar's description field with the JSON data
+    customization_data = {
+        'color': color,
+        'accessories': accessories,
+        'animation': animation
+    }
+
+    avatar.description = json.dumps(customization_data)
+    db.session.commit()
+
+    return jsonify({'success': True, 'avatarId': avatar.id})
+
+
+@game.route('/api/get_avatar_customization', methods=['GET'])
+@login_required
+def api_get_avatar_customization():
+    """API endpoint to get avatar customization"""
+    if not current_user.avatar_id:
+        return jsonify({'success': False, 'error': 'No avatar selected'}), 404
+
+    # Find the avatar
+    avatar = Avatar.query.get(current_user.avatar_id)
+
+    if not avatar:
+        return jsonify({'success': False, 'error': 'Avatar not found'}), 404
+
+    # Get the customization data
+    customization_data = {}
+    if avatar.description:
+        try:
+            customization_data = json.loads(avatar.description)
+        except json.JSONDecodeError:
+            pass
+
+    # Add the avatar ID
+    customization_data['avatarId'] = avatar.id
+
+    return jsonify({'success': True, 'avatarData': customization_data})
 
 
 @game.route('/api/call-user', methods=['POST'])

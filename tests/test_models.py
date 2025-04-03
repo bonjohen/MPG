@@ -283,3 +283,98 @@ def test_game_session_edge_cases(app):
         db.session.commit()
         assert session.status == 'completed'
         assert session.winner_id == user.id
+
+
+def test_game_session_update_score(app):
+    """Test the update_score method of the GameSession model."""
+    with app.app_context():
+        # Get the test user
+        user = db.session.execute(db.select(db.Model.metadata.tables['users']).where(
+            db.Model.metadata.tables['users'].c.username == 'testuser'
+        )).fetchone()
+
+        # Create a new game session
+        session = GameSession(
+            player1_id=user.id,
+            player2_id=user.id,
+            status='playing'
+        )
+        db.session.add(session)
+        db.session.commit()
+
+        # Test updating player 1's score
+        session.update_score(1, 10)
+        db.session.commit()
+        assert session.player1_score == 10
+
+        # Test updating player 2's score
+        session.update_score(2, 5)
+        db.session.commit()
+        assert session.player2_score == 5
+
+        # Test updating with an invalid player number
+        try:
+            session.update_score(3, 15)
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert str(e) == "Invalid player number. Must be 1 or 2."
+
+        # Test updating with a negative score (should be allowed)
+        session.update_score(1, -5)
+        db.session.commit()
+        assert session.player1_score == -5
+
+        # Test updating with a zero score
+        session.update_score(2, 0)
+        db.session.commit()
+        assert session.player2_score == 0
+
+
+def test_game_session_rounds(app):
+    """Test the GameSession rounds relationship."""
+    with app.app_context():
+        from app.models.game_session import GameRound
+
+        # Get the test user
+        user = db.session.execute(db.select(db.Model.metadata.tables['users']).where(
+            db.Model.metadata.tables['users'].c.username == 'testuser'
+        )).fetchone()
+
+        # Create a new game session
+        session = GameSession(
+            player1_id=user.id,
+            player2_id=user.id,
+            status='playing'
+        )
+        db.session.add(session)
+        db.session.commit()
+
+        # Create some rounds for the session
+        round1 = GameRound(
+            session_id=session.id,
+            round_number=1,
+            player1_score=5,
+            player2_score=3,
+            winner_id=user.id
+        )
+        round2 = GameRound(
+            session_id=session.id,
+            round_number=2,
+            player1_score=2,
+            player2_score=7,
+            winner_id=user.id
+        )
+        db.session.add_all([round1, round2])
+        db.session.commit()
+
+        # Test that the rounds are associated with the session
+        assert len(session.rounds) == 2
+        assert session.rounds[0].round_number == 1
+        assert session.rounds[1].round_number == 2
+
+        # Test cascade delete
+        db.session.delete(session)
+        db.session.commit()
+
+        # Check that the rounds were also deleted
+        assert GameRound.query.filter_by(session_id=session.id).count() == 0

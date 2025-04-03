@@ -1,65 +1,83 @@
 {% extends "base.html" %}
 
-{% block title %}Avatar Selection - Motion Powered Games{% endblock %}
+{% block title %}Avatar Customization - Motion Powered Games{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/avatar-customizer.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+<script src="{{ url_for('static', filename='js/avatar-renderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/avatar-customizer.js') }}"></script>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-12">
-            <h1 class="text-center mb-4">Avatar Selection</h1>
-            <p class="text-center mb-4">Choose your avatar for the game</p>
+            <h1 class="text-center mb-4">Avatar Customization</h1>
+            <p class="text-center mb-4">Create and customize your avatar for the game</p>
         </div>
     </div>
-    
+
     <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <img src="{{ url_for('static', filename='img/avatars/default.png') }}" class="card-img-top" alt="Default Avatar">
-                <div class="card-body">
-                    <h5 class="card-title">Default</h5>
-                    <p class="card-text">A basic avatar for those who prefer simplicity.</p>
-                    <button class="btn btn-primary select-avatar" data-avatar-id="1">Select</button>
+        <!-- Avatar Selection Tabs -->
+        <div class="col-md-12 mb-4">
+            <ul class="nav nav-tabs" id="avatarTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="boxer-tab" data-bs-toggle="tab" data-bs-target="#boxer" type="button" role="tab" aria-controls="boxer" aria-selected="true" data-avatar-id="1">Boxer</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="wizard-tab" data-bs-toggle="tab" data-bs-target="#wizard" type="button" role="tab" aria-controls="wizard" aria-selected="false" data-avatar-id="2">Wizard</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="ninja-tab" data-bs-toggle="tab" data-bs-target="#ninja" type="button" role="tab" aria-controls="ninja" aria-selected="false" data-avatar-id="3">Ninja</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 3D Avatar Preview -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Avatar Preview</h3>
+                </div>
+                <div class="card-body p-0">
+                    <div id="avatar-container" class="avatar-container">
+                        <!-- 3D avatar will be rendered here -->
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <button id="reset-view-btn" class="btn btn-sm btn-secondary">Reset View</button>
+                        <button id="toggle-wireframe-btn" class="btn btn-sm btn-info">Toggle Wireframe</button>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <img src="{{ url_for('static', filename='img/avatars/boxer.png') }}" class="card-img-top" alt="Boxer Avatar">
-                <div class="card-body">
-                    <h5 class="card-title">Boxer</h5>
-                    <p class="card-text">A powerful boxer ready for the ring.</p>
-                    <button class="btn btn-primary select-avatar" data-avatar-id="2">Select</button>
+
+        <!-- Customization Controls -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Customize Your Avatar</h3>
                 </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <img src="{{ url_for('static', filename='img/avatars/wizard.png') }}" class="card-img-top" alt="Wizard Avatar">
                 <div class="card-body">
-                    <h5 class="card-title">Wizard</h5>
-                    <p class="card-text">A mystical wizard with powerful spells.</p>
-                    <button class="btn btn-primary select-avatar" data-avatar-id="3">Select</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <img src="{{ url_for('static', filename='img/avatars/ninja.png') }}" class="card-img-top" alt="Ninja Avatar">
-                <div class="card-body">
-                    <h5 class="card-title">Ninja</h5>
-                    <p class="card-text">A stealthy ninja with lightning-fast reflexes.</p>
-                    <button class="btn btn-primary select-avatar" data-avatar-id="4">Select</button>
+                    <div id="avatar-customizer" class="avatar-customizer">
+                        <!-- Customization controls will be rendered here -->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <div class="row mt-4">
         <div class="col-md-12 text-center">
-            <a href="{{ url_for('game.lobby') }}" class="btn btn-secondary">Back to Lobby</a>
+            <a href="{{ url_for('game.lobby') }}" class="btn btn-secondary me-2">Back to Lobby</a>
+            <a href="{{ url_for('game.calibration') }}" class="btn btn-primary">Continue to Calibration</a>
         </div>
     </div>
 </div>
@@ -68,36 +86,109 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const avatarButtons = document.querySelectorAll('.select-avatar');
-        
-        avatarButtons.forEach(button => {
-            button.addEventListener('click', function() {
+        // Initialize the avatar renderer
+        const avatarRenderer = new AvatarRenderer({
+            containerId: 'avatar-container',
+            width: document.getElementById('avatar-container').clientWidth,
+            height: 400,
+            backgroundColor: 0x2c3e50,
+            debugMode: false,
+            autoRotate: true
+        });
+
+        // Initialize the avatar customizer
+        const avatarCustomizer = new AvatarCustomizer({
+            containerId: 'avatar-customizer',
+            avatarRenderer: avatarRenderer,
+            onSave: function(avatarData) {
+                console.log('Avatar saved:', avatarData);
+            }
+        });
+
+        // Handle avatar tab selection
+        const avatarTabs = document.querySelectorAll('#avatarTabs button');
+        avatarTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
                 const avatarId = this.getAttribute('data-avatar-id');
-                
-                // Send AJAX request to update user's avatar
-                fetch('/api/update_avatar', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        avatar_id: avatarId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Avatar updated successfully!');
-                        window.location.href = "{{ url_for('game.lobby') }}";
-                    } else {
-                        alert('Failed to update avatar. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                });
+                loadAvatar(avatarId);
             });
+        });
+
+        // Load the default avatar (Boxer)
+        loadAvatar(1);
+
+        // Function to load an avatar model
+        function loadAvatar(avatarId) {
+            // Clear the current avatar
+            if (avatarRenderer.avatar) {
+                avatarRenderer.scene.remove(avatarRenderer.avatar);
+                avatarRenderer.avatar = null;
+            }
+
+            // Create a default avatar as a placeholder
+            avatarRenderer.createDefaultAvatar();
+
+            // In a real application, you would load a 3D model here
+            // avatarRenderer.loadAvatarModel(`/static/models/avatars/avatar${avatarId}.glb`);
+
+            // Update the customizer with the new avatar ID
+            avatarCustomizer.currentState.avatarId = avatarId;
+
+            // Send AJAX request to update user's avatar
+            fetch('/api/update_avatar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    avatar_id: avatarId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Failed to update avatar:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating avatar:', error);
+            });
+        }
+
+        // Reset view button
+        document.getElementById('reset-view-btn').addEventListener('click', function() {
+            if (avatarRenderer.camera) {
+                avatarRenderer.camera.position.set(0, 1.5, 4);
+                avatarRenderer.camera.lookAt(0, 1, 0);
+                if (avatarRenderer.controls) {
+                    avatarRenderer.controls.target.set(0, 1, 0);
+                    avatarRenderer.controls.update();
+                }
+            }
+        });
+
+        // Toggle wireframe button
+        document.getElementById('toggle-wireframe-btn').addEventListener('click', function() {
+            if (avatarRenderer.avatar) {
+                avatarRenderer.avatar.traverse(function(object) {
+                    if (object.isMesh && object.material) {
+                        if (Array.isArray(object.material)) {
+                            object.material.forEach(material => {
+                                material.wireframe = !material.wireframe;
+                            });
+                        } else {
+                            object.material.wireframe = !object.material.wireframe;
+                        }
+                    }
+                });
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (avatarRenderer) {
+                avatarRenderer.onWindowResize();
+            }
         });
     });
 </script>
